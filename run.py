@@ -1,14 +1,29 @@
 from config import TOKEN
+from uuid import uuid4
 
-from telegram import Update, InlineQueryResultPhoto
+
+from telegram.ext import (Updater,
+                          CommandHandler,
+                          MessageHandler,
+                          Filters,
+                          ConversationHandler)
+
+from telegram import Update, InlineQueryResultPhoto, InlineQueryResultArticle, InputTextMessageContent, ParseMode
 from telegram.ext import Updater, InlineQueryHandler, CommandHandler, CallbackContext
+
+
+SEARCHER = range(1)
 
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
-def start(update: Update, context: CallbackContext) -> None:
-    """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+def start(bot: Update, context: CallbackContext) -> None:
+    bot.message.reply_text(f"Hey!\n"
+                           f"You just need to enter some keywords\n"
+                           f"and our system will advise you the most suitable content.\n"
+                           f"\n"
+                           f"Enter your request, please.")
+    return SEARCHER
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
@@ -16,37 +31,30 @@ def help_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Help!')
 
 
-def inlinequery(bot, update) -> None:
-    """Handle the inline query."""
-    query = bot.inline_query.query
+def searcher(bot: Update, context: CallbackContext):
+    print(bot.message.text)
+    bot.message.reply_text(f"We advise you to watch the movie: any-{bot.message.text}")
 
-    if query == "":
-        return
-
-    print(query)
-    # user_id = bot.inline_query.from_user.id
-    # image_dict = text_sender.send_data(query, size=True, user_id=user_id)
-    # results = [
-    #         InlineQueryResultPhoto(
-    #             id=str(uuid4()),
-    #             photo_url=image_dict['paths'][idx],
-    #             thumb_url=image_dict['paths'][idx],
-    #             photo_width=image_dict['width'][idx],
-    #             photo_height=image_dict['height'][idx],
-    #         )
-    #         for idx in range(len(image_dict['paths']))
-    # ]
-    # bot.inline_query.answer(results)
-
+    return SEARCHER
 
 
 def main() -> None:
+
+    rs_handler = ConversationHandler(
+        entry_points=[MessageHandler(Filters.regex('^/start$'), start)],
+        states={
+            SEARCHER: [MessageHandler(Filters.text & ~(Filters.command), searcher)
+            ]
+
+        },
+        fallbacks=[]
+    )
+
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
+    dispatcher.add_handler(rs_handler)
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", help_command))
-
-    dispatcher.add_handler(InlineQueryHandler(inlinequery, run_async=True))
 
     # Start the Bot
     updater.start_polling()
