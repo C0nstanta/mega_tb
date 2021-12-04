@@ -1,5 +1,5 @@
 from sentence_transformers import SentenceTransformer, util
-from Pillow import Image
+from PIL import Image
 
 
 class ClipEmbedding:
