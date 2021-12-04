@@ -8,12 +8,14 @@ from telegram.ext import (Updater,
                           Filters,
                           ConversationHandler)
 
-from telegram import Update, InlineQueryResultPhoto, InlineQueryResultArticle, InputTextMessageContent, ParseMode
+from telegram import Update
 from telegram.ext import Updater, InlineQueryHandler, CommandHandler, CallbackContext
 
+from libs.clip import ClipEmbedding, SentenceTransformer
 
 SEARCHER = range(1)
 
+clip = ClipEmbedding()
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
