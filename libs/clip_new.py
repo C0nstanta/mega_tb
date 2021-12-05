@@ -18,6 +18,8 @@ class ClipEmbedding:
         self.movie_title_df = pd.read_csv(file_path + '/raw_data/Movie_Id_Titles.csv')
         self.movie_rating_df = pd.read_csv(file_path + '/raw_data/Movie_Recommender_Dataset.csv.zip')
 
+        self.target_vec, self.correction = self.df_processing()
+
     def df_processing(self):
         movie_title_df_tmp = pd.merge(self.movie_title_df, self.you_ds.drop(columns=['movieId']), on='title')
 
@@ -34,12 +36,11 @@ class ClipEmbedding:
 
     def get_recommend(self, input_text, top=5):
         input_vec = self.text_model.encode([input_text])
-        target_vec, correction = self.df_processing()
 
         df = pd.DataFrame(
             util.semantic_search(
-                input_vec - correction,
-                target_vec - correction,
+                input_vec - self.correction,
+                self.target_vec - self.correction,
                 top_k=top)[0]).merge(self.vid_emb, on='corpus_id')
 
         df = df.loc[:, ['title', 'score', 'youtubeId']]

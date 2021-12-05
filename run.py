@@ -37,7 +37,12 @@ def searcher(bot: Update, context: CallbackContext):
     print(bot.message.text)
 
     recommend_film = clip.get_recommend(bot.message.text)
-    bot.message.reply_text(f"We advise you to watch the movie: {recommend_film}")
+    head_text = '<b><i>5 Movies You Have to Watch:</i></b>\n\n'
+
+    body_text = '\n'.join(['<b>' + str(idx + 1) + '</b>  <b>' + film_name + '</b>'
+                 for idx, film_name in enumerate(recommend_film['title'])])
+
+    bot.message.reply_text(head_text + body_text, parse_mode='HTML')
     return SEARCHER
 
 
