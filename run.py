@@ -11,7 +11,7 @@ from telegram.ext import (Updater,
 from telegram import Update
 from telegram.ext import Updater, InlineQueryHandler, CommandHandler, CallbackContext
 
-from libs.clip import ClipEmbedding, SentenceTransformer
+from libs.clip_new import ClipEmbedding
 
 SEARCHER = range(1)
 
@@ -35,8 +35,9 @@ def help_command(update: Update, context: CallbackContext) -> None:
 
 def searcher(bot: Update, context: CallbackContext):
     print(bot.message.text)
-    bot.message.reply_text(f"We advise you to watch the movie: any-{bot.message.text}")
 
+    recommend_film = clip.get_recommend(bot.message.text)
+    bot.message.reply_text(f"We advise you to watch the movie: {recommend_film}")
     return SEARCHER
 
 
