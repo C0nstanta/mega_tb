@@ -39,10 +39,15 @@ def searcher(bot: Update, context: CallbackContext):
     recommend_film = clip.get_recommend(bot.message.text)
     head_text = '<b><i>5 Movies You Have to Watch:</i></b>\n\n'
 
-    body_text = '\n'.join(['<b>' + str(idx + 1) + '</b>  <b>' + film_name + '</b>'
-                 for idx, film_name in enumerate(recommend_film['title'])])
+    body_text = '\n'.join(['<b>' + str(idx + 1) + '</b>'
+                '<b>'
+                    '<a href="https://www.youtube.com/watch?v=' + row['youtubeId'] + '" > ' + row['title'] + '</a>'
+                '</b>'
+                for idx, row in recommend_film.iterrows()])
 
-    bot.message.reply_text(head_text + body_text, parse_mode='HTML')
+    footer = '\n\nThis representation may not be optimal because the dataset has only a base of 1000 films.'
+
+    bot.message.reply_text(head_text + body_text + footer, parse_mode='HTML')
     return SEARCHER
 
 
